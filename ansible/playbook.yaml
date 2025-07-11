@@ -23,12 +23,6 @@
       args:
         executable: /bin/bash
 
-    - name: Delete existing Kubernetes service (if any)
-      shell: |
-        kubectl delete service {{ service_name }} --namespace {{ namespace }} --ignore-not-found
-      args:
-        executable: /bin/bash
-
     - name: Apply new Kubernetes deployment and service
       shell: |
         kubectl apply -f {{ project_path }}/k8s/deployment.yaml
