@@ -30,3 +30,9 @@
         state: started
         ports:
           - "{{ app_port }}:8080"
+
+    - name: Deploy to Kubernetes using kubectl apply
+      ansible.builtin.shell: |
+       kubectl apply -f {{ project_path }}/ansible/deployment.yaml
+      args:
+       executable: /bin/bash
