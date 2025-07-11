@@ -1,0 +1,33 @@
+---
+- name: Build and run Docker container for Java app
+  hosts: localhost
+  become: true
+  vars:
+    project_path: "{{ lookup('env', 'WORKSPACE') | default('../', true) }}"
+    image_name: myapp
+    container_name: myapp-container
+    app_port: 8090
+
+  tasks:
+    - name: Build Docker image from Dockerfile
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        tag: latest
+        source: build
+        build:
+          path: "{{ project_path }}"
+          dockerfile: Dockerfile
+
+    - name: Remove existing container (if any)
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
+        force_kill: true
+
+    - name: Run the Docker container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}:latest"
+        state: started
+        ports:
+          - "{{ app_port }}:8080"
