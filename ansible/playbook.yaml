@@ -1,50 +1,45 @@
----
 - name: Build and deploy Java Tomcat app on Minikube
   hosts: localhost
   vars:
-    project_path: "{{ lookup('env', 'WORKSPACE') | default('../', true) }}"
+    project_path: '{{ lookup(''env'', ''WORKSPACE'') | default(''../'', true) }}'
     image_name: my-app
     image_tag: latest
     deployment_name: depl-myapp
     service_name: myapp-svc
     namespace: default
-
   tasks:
     - name: Build Docker image
       community.docker.docker_image:
-        name: "{{ image_name }}"
-        tag: "{{ image_tag }}"
+        name: '{{ image_name }}'
+        tag: '{{ image_tag }}'
         source: build
         build:
-          path: "{{ project_path }}"
-
+          path: '{{ project_path }}'
     - name: Log in to Docker Hub
-      community.docker.docker_login:
-      username: "{{ dockerhub_username }}"
-      password: "{{ dockerhub_password }}"
-
+      community.docker.docker_login: null
+      username: '{{ dockerhub_username }}'
+      password: '{{ dockerhub_password }}'
     - name: Push Docker image to Docker Hub
       community.docker.docker_image:
-       name: "{{ image_name }}"
-       tag: "{{ image_tag }}"
-       push: true 
-
+        name: '{{ image_name }}'
+        tag: '{{ image_tag }}'
+        push: true
     - name: Delete existing Kubernetes deployment (if any)
-      shell: |
-       kubectl delete deployment {{ deployment_name }} --namespace {{ namespace }} --ignore-not-found
+      shell: >
+        kubectl delete deployment {{ deployment_name }} --namespace {{ namespace
+        }} --ignore-not-found
       args:
-       executable: /bin/bash
-
+        executable: /bin/bash
     - name: Delete existing Kubernetes service (if any)
-      shell: |
-       kubectl delete service {{ service_name }} --namespace {{ namespace }} --ignore-not-found
+      shell: >
+        kubectl delete service {{ service_name }} --namespace {{ namespace }}
+        --ignore-not-found
       args:
-       executable: /bin/bash
-
+        executable: /bin/bash
     - name: Apply new Kubernetes deployment and service
       shell: |
         kubectl apply -f {{ project_path }}/k8s/deployment.yaml
       args:
         executable: /bin/bash
       environment:
-       KUBECONFIG: /var/lib/jenkins/.kube/config
+        KUBECONFIG: /var/lib/jenkins/.kube/config
