@@ -3,7 +3,7 @@
   hosts: localhost
   vars:
     project_path: "{{ lookup('env', 'WORKSPACE') | default('../', true) }}"
-    image_name: my-app
+    image_name: ramesharpu/my-app
     image_tag: latest
     deployment_name: depl-myapp
     service_name: myapp-svc
