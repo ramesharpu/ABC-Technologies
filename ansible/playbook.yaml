@@ -31,6 +31,6 @@
 
     - name: Apply new Kubernetes deployment and service
       shell: |
-        kubectl apply -f {{ project_path }}/ansible/deployment.yaml
+        kubectl apply -f {{ project_path }}/k8s/deployment.yaml
       args:
         executable: /bin/bash
