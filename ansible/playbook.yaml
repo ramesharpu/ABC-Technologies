@@ -1,7 +1,6 @@
 ---
 - name: Build and run Docker container for Java app
   hosts: localhost
-  become: true
   vars:
     project_path: "{{ lookup('env', 'WORKSPACE') | default('../', true) }}"
     image_name: myapp
