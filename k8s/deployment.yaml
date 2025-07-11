@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: myapp:latest
+        image: ramesharpu/my-app:latest
         ports:
         - containerPort: 8080
 ---
