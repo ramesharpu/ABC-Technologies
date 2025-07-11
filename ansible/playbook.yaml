@@ -27,6 +27,7 @@
       community.docker.docker_image:
        name: "{{ image_name }}"
        tag: "{{ image_tag }}"
+       source: local
        push: true 
 
     - name: Delete existing Kubernetes deployment (if any)
