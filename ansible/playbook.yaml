@@ -22,3 +22,5 @@
         kubectl apply -f {{ project_path }}/k8s/deployment.yaml
       args:
         executable: /bin/bash
+      environment:
+       KUBECONFIG: /var/lib/jenkins/.kube/config
