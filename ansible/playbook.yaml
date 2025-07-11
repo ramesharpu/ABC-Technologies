@@ -1,38 +1,36 @@
 ---
-- name: Build and run Docker container for Java app
+- name: Build and deploy Java Tomcat app on Minikube
   hosts: localhost
   vars:
     project_path: "{{ lookup('env', 'WORKSPACE') | default('../', true) }}"
-    image_name: myapp
-    container_name: myapp-container
-    app_port: 8090
+    image_name: my-app
+    deployment_name: depl-myapp
+    service_name: myapp-svc
+    namespace: default
 
   tasks:
-    - name: Build Docker image from Dockerfile
+    - name: Build Docker image
       community.docker.docker_image:
         name: "{{ image_name }}"
         tag: latest
         source: build
         build:
           path: "{{ project_path }}"
-          dockerfile: Dockerfile
 
-    - name: Remove existing container (if any)
-      community.docker.docker_container:
-        name: "{{ container_name }}"
-        state: absent
-        force_kill: true
-
-    - name: Run the Docker container
-      community.docker.docker_container:
-        name: "{{ container_name }}"
-        image: "{{ image_name }}:latest"
-        state: started
-        ports:
-          - "{{ app_port }}:8080"
-
-    - name: Deploy to Kubernetes using kubectl apply
-      ansible.builtin.shell: |
-       kubectl apply -f {{ project_path }}/ansible/deployment.yaml
+    - name: Delete existing Kubernetes deployment (if any)
+      shell: |
+        kubectl delete deployment {{ deployment_name }} --namespace {{ namespace }} --ignore-not-found
       args:
-       executable: /bin/bash
+        executable: /bin/bash
+
+    - name: Delete existing Kubernetes service (if any)
+      shell: |
+        kubectl delete service {{ service_name }} --namespace {{ namespace }} --ignore-not-found
+      args:
+        executable: /bin/bash
+
+    - name: Apply new Kubernetes deployment and service
+      shell: |
+        kubectl apply -f {{ project_path }}/ansible/deployment.yaml
+      args:
+        executable: /bin/bash
